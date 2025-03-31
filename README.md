@@ -17,7 +17,12 @@ Clone the repository and add the System.Console.pas file to your project, or add
 
 The Console class is a static class, so you use it just like in C#
 
-````
+
+
+````delphi
+uses
+  System.Console;
+
 begin
   Console.SetColors(TConsoleColor.Yellow, TConsoleColor.DarkBlue);
   Console.Clear;
