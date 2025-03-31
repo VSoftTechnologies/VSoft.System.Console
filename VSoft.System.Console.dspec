@@ -2,13 +2,13 @@
  "metadata": {
   "id": "VSoft.System.Console",
   "version": "1.0.0",
-  "description": "Dotnet System.Console implementation for Delphi - windows only so far. ",
+  "description": "System.Console implementation for Delphi - windows only. ",
   "authors": "Vincent Parrett",
   "projectUrl": "https://github.com/VSoftTechnologies/VSoft.System.Console",
   "repositoryUrl": "https://github.com/VSoftTechnologies/VSoft.System.Console",
   "license": "Apache-2.0",
   "copyright": "Vincent Parrett and contributors",
-  "tags": "console",
+  "tags": "console system",
   "readme": "README.md"
  },
  "targetPlatforms": [

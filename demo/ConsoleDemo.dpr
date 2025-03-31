@@ -27,10 +27,9 @@ end;
 
 begin
   try
-    Console.OutputEncoding := TEncoding.UTF8;
     Console.CancelKeyPress := CancelProc;
     Console.SetWindowSize(200,60);
-    Console.SetColors(TConsoleColor.Red, TConsoleColor.White);
+    Console.SetColors(TConsoleColor.Yellow, TConsoleColor.DarkBlue);
     Console.Clear;
     Console.SetCursorPosition(20,0);
     Console.WriteLine('abcdef');
@@ -39,8 +38,6 @@ begin
     Sleep(500);
 
     Console.CursorSize := 5;
-    Console.BackgroundColor := TConsoleColor.Black;
-    Console.ForegroundColor := TConsoleColor.White;
     Console.Clear;
     Console.WriteLine('Ctrl+C to close');
 //    Console.SetCursorPosition(10,20);
