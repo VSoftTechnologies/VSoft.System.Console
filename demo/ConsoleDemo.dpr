@@ -28,7 +28,7 @@ end;
 begin
   try
     Console.CancelKeyPress := CancelProc;
-    Console.SetWindowSize(200,60);
+    Console.SetWindowSize(160,40);
     Console.SetColors(TConsoleColor.Yellow, TConsoleColor.DarkBlue);
     Console.Clear;
     Console.SetCursorPosition(20,0);
@@ -36,7 +36,6 @@ begin
     Sleep(500);
     Console.MoveBufferArea(20,0,6,1,20,1);
     Sleep(500);
-
     Console.CursorSize := 5;
     Console.Clear;
     Console.WriteLine('Ctrl+C to close');
