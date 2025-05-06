@@ -1,7 +1,7 @@
 {
  "metadata": {
   "id": "VSoft.System.Console",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "System.Console implementation for Delphi - windows only. ",
   "authors": "Vincent Parrett",
   "projectUrl": "https://github.com/VSoftTechnologies/VSoft.System.Console",
