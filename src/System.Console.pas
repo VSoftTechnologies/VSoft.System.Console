@@ -16,6 +16,7 @@ uses
 //in their uses clause.
 type
   TConsoleKey       = System.Console.Types.TConsoleKey;
+  TConsoleKeyInfo   = System.Console.Types.TConsoleKeyInfo;
   TConsoleColor     = System.Console.Types.TConsoleColor;
   TConsoleModifier  = System.Console.Types.TConsoleModifier;
   TConsoleModifiers = System.Console.Types.TConsoleModifiers;
