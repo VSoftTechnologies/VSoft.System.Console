@@ -314,7 +314,30 @@ begin
   inherited;
 end;
 
+
+
+
 procedure TWindowsConsole.EnsureConsole;
+
+  function EnableVirtualTerminalProcessing : boolean;
+  var
+    consoleMode: DWORD;
+  begin
+    result := false;
+    if FStdOut = INVALID_HANDLE_VALUE then
+      exit;
+
+    if not GetConsoleMode(FStdOut, consoleMode) then
+      exit;
+
+    consoleMode := consoleMode or ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    if not SetConsoleMode(FStdOut, consoleMode) then
+      exit;
+
+    result := true;
+  end;
+
+
 var
   bufferInfo : TConsoleScreenBufferInfo;
 begin
@@ -327,12 +350,23 @@ begin
   FStdOut := GetStdHandle(STD_OUTPUT_HANDLE);
   FStdErr := GetStdHandle(STD_ERROR_HANDLE);
 
+  if not GetIsOutputRedirected then
+  begin
+    if not EnableVirtualTerminalProcessing then
+    begin
+    // set IOResult;
+      SetInOutRes(GetLastError);
+      exit;
+    end;
+  end;
+
   if not GetConsoleScreenBufferInfo(FStdOut, bufferInfo) then
   begin
     // set IOResult;
     SetInOutRes(GetLastError);
     exit;
   end;
+
 
   FInitialTextAttributes := bufferInfo.wAttributes and $FF;
   FCurrentTextAttributes := FInitialTextAttributes;
