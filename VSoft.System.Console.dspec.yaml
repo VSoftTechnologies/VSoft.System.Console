@@ -1,0 +1,44 @@
+# DPM package spec file
+# Used to build packages
+
+min client version: 1.0
+# metadata describes the package to the user
+metadata:
+  id: VSoft.System.Console
+  version: 1.1.2
+  authors: [ Vincent Parrett ]
+  description: System.Console implementation for Delphi - windows only.
+  projectUrl: https://github.com/VSoftTechnologies/VSoft.System.Console
+  repositoryUrl: https://github.com/VSoftTechnologies/VSoft.System.Console
+  license: Apache-2.0
+  readme: README.md
+  copyright: Vincent Parrett and contributors
+  tags: [ console ]
+  repositoryCommit: Id:7dc3f30aa2bf292608c4a9cd5174eaf8d8fafa62
+
+# define variable defaults - can be overriden in targetPlatforms
+variables:
+  packageSource: "Rad Studio $compilernoprefix$"
+
+# package folder names are a mess. 
+targetPlatforms:
+  - compiler from: delphixe2
+    compiler to: delphi10.4
+    platforms: [ win32, win64 ]
+  - compiler from: delphi11
+    compiler to: delphi13
+    platforms: [ win32, win64 ]
+    variables:
+      packageSource: "Rad Studio $compilernoprefix$.0"
+
+templates:
+  - name: default
+    source:
+      - src: ./src/*.pas
+      - src: ./src/*.inc
+      - src: ./packages/$packageSource$/*.dpk
+        dest: ./packages/$packageSource$
+      - src: ./packages/$packageSource$/*.dproj
+        dest: ./packages/$packageSource$
+    build:
+      - project: ./packages/$packageSource$/VSoft.System.ConsoleR.dproj
