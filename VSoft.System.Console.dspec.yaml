@@ -14,7 +14,7 @@ metadata:
   readme: README.md
   copyright: Vincent Parrett and contributors
   tags: [ console ]
-  repositoryCommit: Id:7dc3f30aa2bf292608c4a9cd5174eaf8d8fafa62
+  repositoryCommit: #HASH#
 
 # define variable defaults - can be overriden in targetPlatforms
 variables:
