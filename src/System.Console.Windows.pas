@@ -314,6 +314,9 @@ begin
   inherited;
 end;
 
+// only defined in 10,4 or later
+const
+    ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
 
 
 
