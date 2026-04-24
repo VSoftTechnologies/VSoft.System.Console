@@ -39,6 +39,10 @@ contains
   System.Console.StreamWriter in '..\..\src\System.Console.StreamWriter.pas',
   System.Console.SyncTextReader in '..\..\src\System.Console.SyncTextReader.pas',
   System.Console.Types in '..\..\src\System.Console.Types.pas',
+{$IFDEF MSWINDOWS}
   System.Console.Windows in '..\..\src\System.Console.Windows.pas';
+{$ELSE}
+  System.Console.Posix in '..\..\src\System.Console.Posix.pas';
+{$ENDIF}
 
 end.
