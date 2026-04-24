@@ -22,7 +22,7 @@ variables:
 
 # package folder names are a mess. 
 targetPlatforms:
-  - compiler from: delphixe2
+  - compiler from: delphixe3
     compiler to: delphi10.4
     platforms: [ win32, win64 ]
   - compiler from: delphi11
