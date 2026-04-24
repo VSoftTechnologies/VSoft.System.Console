@@ -157,6 +157,7 @@ type
       OemClear = $FE
   );
 
+  {$MINENUMSIZE 2} //casting this was causing internal errors
   TConsoleColor = (
         Black = 0,
         DarkBlue = 1,
@@ -176,6 +177,7 @@ type
         White = 15,
         NotSet = 99
     );
+  {$MINENUMSIZE 1}
 
     TConsoleModifier = (
         None = 0,
