@@ -5,16 +5,16 @@ min client version: 1.0
 # metadata describes the package to the user
 metadata:
   id: VSoft.System.Console
-  version: 1.1.4
+  version: 1.2.0
   authors: [ Vincent Parrett ]
   description: System.Console implementation for Delphi - Windows, macOS, and Linux.
   projectUrl: https://github.com/VSoftTechnologies/VSoft.System.Console
   repositoryUrl: https://github.com/VSoftTechnologies/VSoft.System.Console
+  repositoryCommit: #HASH#
   license: Apache-2.0
   readme: README.md
   copyright: Vincent Parrett and contributors
   tags: [ console ]
-  repositoryCommit: #HASH#
 
 # define variable defaults - can be overriden in targetPlatforms
 variables:
@@ -23,16 +23,21 @@ variables:
 # package folder names are a mess. 
 targetPlatforms:
   - compiler from: delphixe3
-    compiler to: delphi10.4
-    platforms: [ win32, win64 ]
+    compiler to: delphi10.1
+    platforms: [ win32, win64, macos32 ]
+  - compiler from: delphi10.2
+    compiler to: delphi10.3
+    platforms: [ win32, win64, macos32, macos64, linux64 ]
+  - compiler from: delphi10.4
+    compiler to: delphi12
+    platforms: [ win32, win64, macos64, linux64 ]
   - compiler from: delphi11
     compiler to: delphi12
-    platforms: [ win32, win64 ]
+    platforms: [ win32, win64, macos64, macosarm64, linux64 ]
     variables:
       packageSource: "Rad Studio $compilernoprefix$.0"
-  - compiler from: delphi13
-    compiler to: delphi13
-    platforms: [ win32, win64, linux64, macos64 ]
+  - compiler: delphi13
+    platforms: [ win32, win64, winarm64ec, macos64, macosarm64, linux64 ]
     variables:
       packageSource: "Rad Studio $compilernoprefix$.0"
 
