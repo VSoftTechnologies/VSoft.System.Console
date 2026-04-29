@@ -629,7 +629,6 @@ function TWindowsConsole.GetTreatControlCAsInput: boolean;
 var
   mode: DWORD;
 begin
-  Result := false;
   if FStdIn = INVALID_HANDLE_value then
     raise EInvalidOperation.Create('No console available');
   Mode := 0;
