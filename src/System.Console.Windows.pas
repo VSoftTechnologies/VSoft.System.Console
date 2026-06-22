@@ -509,15 +509,18 @@ begin
     if (numEventsRead = 0) then
       exit(false);
 
-    // Skip non-significant events.
+    // Skip non-significant events: consume them and peek the next one. Only a
+    // real (readable) key event at the head of the buffer means a key is
+    // available - mirrors the consume-and-continue loop in ReadKey.
     if (not IsReadKeyEvent(@ir)) then
     begin
       r := ReadConsoleInput(FStdIn, ir2, 1, numEventsRead);
       if (not r) then
-        RaiseLastOSError
-      else
-        exit(true);
-    end;
+        RaiseLastOSError;
+      // event consumed - loop around to peek the next event
+    end
+    else
+      exit(true);
   end;
 end;
 

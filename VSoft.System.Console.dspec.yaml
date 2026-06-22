@@ -1,42 +1,65 @@
 # DPM package spec file
-# Used to build packages
-
-min client version: 1.0
-# metadata describes the package to the user
+min dpm client version: 1.0.0
 metadata:
   id: VSoft.System.Console
-  version: 1.2.2
-  authors: [ Vincent Parrett ]
-  description: System.Console implementation for Delphi - Windows, macOS, and Linux.
+  version: 1.2.3
+  description: 'System.Console implementation for Delphi - Windows, macOS, and Linux.'
+  authors:
+    - Vincent Parrett
   projectUrl: https://github.com/VSoftTechnologies/VSoft.System.Console
   repositoryUrl: https://github.com/VSoftTechnologies/VSoft.System.Console
   repositoryCommit: #HASH#
   license: Apache-2.0
-  readme: README.md
   copyright: Vincent Parrett and contributors
-  tags: [ console ]
-
-# define variable defaults - can be overriden in targetPlatforms
+  tags:
+    - console
+  readme: README.md
 variables:
-  packageSource: "Rad Studio $compilernoprefix$"
-
-# package folder names are a mess. 
+  # define variable defaults - can be overriden in targetPlatforms
+  packagesource: Rad Studio $compilernoprefix$
 targetPlatforms:
+  # package folder names are a mess. 
   - compiler from: delphixe3
     compiler to: delphi10.1
-    platforms: [ win32, win64, macos32 ]
+    platforms:
+      - win32
+      - win64
+      - macos32
   - compiler: delphi10.2
-    platforms: [ win32, win64, macos32, linux64 ]
+    platforms:
+      - win32
+      - win64
+      - macos32
+      - linux64
   - compiler: delphi10.3
-    platforms: [ win32, win64, macos32, macos64, linux64 ]
+    platforms:
+      - win32
+      - win64
+      - macos32
+      - macos64
+      - linux64
   - compiler: delphi10.4
-    platforms: [ win32, win64, macos64, linux64 ]
+    platforms:
+      - win32
+      - win64
+      - macos64
+      - linux64
   - compiler from: delphi11.0
     compiler to: delphi12.0
-    platforms: [ win32, win64, macos64, macosarm64, linux64 ]
+    platforms:
+      - win32
+      - win64
+      - macos64
+      - macosarm64
+      - linux64
   - compiler: delphi13.0
-    platforms: [ win32, win64, winarm64ec, macos64, macosarm64, linux64 ]
-
+    platforms:
+      - win32
+      - win64
+      - winarm64ec
+      - macos64
+      - macosarm64
+      - linux64
 templates:
   - name: default
     source:
