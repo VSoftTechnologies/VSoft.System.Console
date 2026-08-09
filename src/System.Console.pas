@@ -410,8 +410,11 @@ begin
     MonitorEnter(FSyncObject);
     try
       stream := OpenStandardError;
+      //TConsoleStreamWriter always frees its stream in Close, so there is no
+      //OwnStream to call here. Do not cast to TStreamWriter - TConsoleStreamWriter
+      //descends from TTextWriter, not TStreamWriter, so the cast would write a
+      //boolean at whatever field happens to sit at TStreamWriter.FOwnsStream's offset.
       newWriter := TConsoleStreamWriter.Create(stream,OutputEncoding);
-      TStreamWriter(newWriter).OwnStream;
       if TInterlocked.CompareExchange(Pointer(FStdError), Pointer(newWriter), nil) <> nil then
         //Another thread beat us. Destroy our newly created object and use theirs.
         newWriter.Free;
@@ -447,8 +450,9 @@ begin
     MonitorEnter(FSyncObject);
     try
       stream := OpenStandardOutput;
+      //see the note in GetStdError - TConsoleStreamWriter is not a TStreamWriter
+      //and always owns its stream.
       newWriter := TConsoleStreamWriter.Create(stream,OutputEncoding);
-      TStreamWriter(newWriter).OwnStream;
       if TInterlocked.CompareExchange(Pointer(FStdOutput), Pointer(newWriter), nil) <> nil then
         //Another thread beat us. Destroy our newly created object and use theirs.
         newWriter.Free;

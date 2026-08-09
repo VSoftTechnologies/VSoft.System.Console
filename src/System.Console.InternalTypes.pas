@@ -154,14 +154,15 @@ uses
   System.TypInfo,
   System.Rtti,
   System.Console,
-  {$IFDEF MSWINDOWS}
+  //$ELSEIF is only valid after $IF, never after $IFDEF, and it takes an
+  //expression - a bare MACOS is not the same as Defined(MACOS). Getting either
+  //wrong silently drops every non-Windows platform into the $ELSE branch.
+  {$IF Defined(MSWINDOWS)}
   System.Console.Windows;
-  {$ELSEIF MACOS }
-  System.Console.Posix;
-  {$ELSEIF LINUX }
+  {$ELSEIF Defined(MACOS) or Defined(LINUX)}
   System.Console.Posix;
   {$ELSE}
-    Invalid platform
+  {$MESSAGE FATAL 'VSoft.System.Console does not support this platform'}
   {$IFEND}
 
 procedure TConsoleImplementation.Write(const s: string);
@@ -313,14 +314,12 @@ end;
 
 class function TConsoleImplFactory.CreateConsole: TConsoleImplementation;
 begin
-  {$IFDEF MSWINDOWS}
+  {$IF Defined(MSWINDOWS)}
   result := TWindowsConsole.Create;
-  {$ELSEIF MACOS }
-  result := TPosixConsole.Create;
-  {$ELSEIF LINUX }
+  {$ELSEIF Defined(MACOS) or Defined(LINUX)}
   result := TPosixConsole.Create;
   {$ELSE}
-    Invalid platform
+  {$MESSAGE FATAL 'VSoft.System.Console does not support this platform'}
   {$IFEND}
 end;
 

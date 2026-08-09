@@ -51,6 +51,14 @@ type
 
     FCancelKeyPress : TConsoleCancelEventHandler;
 
+    //State recorded by EnsureConsole. Note that EnsureConsole runs from the
+    //Console class constructor, ie during unit initialization, so it must never
+    //report failure through a global RTL flag like InOutRes - doing so makes an
+    //unrelated statement in the host application fail with an I/O error.
+    FConsoleAvailable : boolean;
+    FVirtualTerminalEnabled : boolean;
+    FLastConsoleError : DWORD;
+
     function IsReadKeyEvent(ir : PInputRecord) : boolean;
   protected
     function ConsoleHandleIsWritable(outErrHandle : THandle) : boolean;
@@ -153,7 +161,13 @@ type
     function GetTreatControlCAsInput: boolean;override;
     procedure SetTreatControlCAsInput(value : boolean);override;
 
-
+    //True when we have a console screen buffer we can query - false when stdout
+    //is redirected to a file or a pipe, or when there is no console at all.
+    property ConsoleAvailable : boolean read FConsoleAvailable;
+    //True when ENABLE_VIRTUAL_TERMINAL_PROCESSING was successfully turned on.
+    property VirtualTerminalEnabled : boolean read FVirtualTerminalEnabled;
+    //The last error EnsureConsole encountered, ERROR_SUCCESS when there was none.
+    property LastConsoleError : DWORD read FLastConsoleError;
   end;
 
   TWindowsConsoleStream = class(TConsoleStream)
@@ -319,6 +333,29 @@ const
     ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
 
 
+//Returns true when the process is attached to a console. GetConsoleCP returns 0
+//when the calling process has no console. Unlike GetConsoleWindow this still
+//works when the console has no window of its own (ConPTY, Windows Terminal).
+function HasConsole : boolean;
+begin
+  result := GetConsoleCP <> 0;
+end;
+
+//Distinguishes "the caller redirected us to a file or a pipe" from "we simply do
+//not have a handle". IsHandleRedirected reports true for a null or invalid
+//handle, which is not the same thing and must not stop us attaching a console.
+function HandleIsFileOrPipe(handle : THandle) : boolean;
+var
+  fileType : DWORD;
+begin
+  result := false;
+  if (handle = 0) or (handle = INVALID_HANDLE_value) then
+    exit;
+  //mask off FILE_TYPE_REMOTE
+  fileType := GetFileType(handle) and $FF;
+  result := (fileType = FILE_TYPE_DISK) or (fileType = FILE_TYPE_PIPE);
+end;
+
 
 procedure TWindowsConsole.EnsureConsole;
 
@@ -344,33 +381,49 @@ procedure TWindowsConsole.EnsureConsole;
 var
   bufferInfo : TConsoleScreenBufferInfo;
 begin
-  // first try attach to the parent process's console
-  if not AttachConsole(ATTACH_PARENT_PROCESS) then
-    AllocConsole; // this fails and we are ignore it.
+  FConsoleAvailable := false;
+  FVirtualTerminalEnabled := false;
+  FLastConsoleError := ERROR_SUCCESS;
 
-  // if we got here we either have the parent process or our own console so fetch the handles again.
-  FStdIn := GetStdHandle(STD_INPUT_HANDLE);
-  FStdOut := GetStdHandle(STD_OUTPUT_HANDLE);
-  FStdErr := GetStdHandle(STD_ERROR_HANDLE);
+  // Only attach or allocate a console when we do not already have one, and only
+  // when the caller has not redirected us to a file or a pipe. Without this
+  // guard a host with no console of its own - eg a GUI app - gets a console
+  // window allocated behind its back even though its output was redirected and
+  // nothing will ever be displayed in it. AttachConsole/AllocConsole also rebind
+  // any std handle that is not already set, so leaving them unguarded makes what
+  // the process writes to depend on how it happened to be launched.
+  if (not HasConsole) and (not HandleIsFileOrPipe(FStdIn)) and
+     (not HandleIsFileOrPipe(FStdOut)) and (not HandleIsFileOrPipe(FStdErr)) then
+  begin
+    // first try attach to the parent process's console
+    if not AttachConsole(ATTACH_PARENT_PROCESS) then
+      AllocConsole; // this can fail and we ignore it.
+
+    // we now have either the parent process's console or our own, so fetch the handles again.
+    FStdIn := GetStdHandle(STD_INPUT_HANDLE);
+    FStdOut := GetStdHandle(STD_OUTPUT_HANDLE);
+    FStdErr := GetStdHandle(STD_ERROR_HANDLE);
+  end;
 
   if not GetIsOutputRedirected then
   begin
-    if not EnableVirtualTerminalProcessing then
-    begin
-    // set IOResult;
-      SetInOutRes(GetLastError);
-      exit;
-    end;
+    // Older terminals simply do not support VT sequences, that is not fatal, so
+    // record it and carry on rather than abandoning the rest of the setup.
+    FVirtualTerminalEnabled := EnableVirtualTerminalProcessing;
+    if not FVirtualTerminalEnabled then
+      FLastConsoleError := GetLastError;
   end;
 
   if not GetConsoleScreenBufferInfo(FStdOut, bufferInfo) then
   begin
-    // set IOResult;
-    SetInOutRes(GetLastError);
+    // We have no console screen buffer - eg stdout is redirected to a file or a
+    // pipe. That is a normal condition, not an I/O error, so just record it.
+    // Do NOT touch InOutRes here, see the note on FConsoleAvailable above.
+    FLastConsoleError := GetLastError;
     exit;
   end;
 
-
+  FConsoleAvailable := true;
   FInitialTextAttributes := bufferInfo.wAttributes and $FF;
   FCurrentTextAttributes := FInitialTextAttributes;
   FTextWindow := TRect.Create(0, 0, bufferInfo.dwSize.x - 1, bufferInfo.dwSize.y - 1);

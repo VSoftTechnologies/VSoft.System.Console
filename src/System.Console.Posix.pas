@@ -14,9 +14,9 @@ uses
   {$IFDEF POSIX}
   ,Posix.Base
   ,Posix.Errno
+  ,Posix.SysTypes
   ,Posix.Unistd
   ,Posix.Termios
-  ,Posix.SysIoctl
   ,Posix.SysSelect
   ,Posix.SysTime
   ,Posix.Signal
@@ -194,6 +194,30 @@ uses
 
 {$IFDEF POSIX}
 
+//The RTL ships no Posix.SysIoctl unit on either Linux or macOS, so declare the
+//little of it we need. struct winsize has the same layout on Linux and on
+//macOS/BSD, but the TIOCGWINSZ request code differs.
+type
+  winsize = record
+    ws_row    : Word;
+    ws_col    : Word;
+    ws_xpixel : Word;
+    ws_ypixel : Word;
+  end;
+
+const
+  {$IF Defined(MACOS)}
+  //_IOR('t', 104, struct winsize)
+  TIOCGWINSZ = $40087468;
+  {$ELSE}
+  TIOCGWINSZ = $5413;
+  {$IFEND}
+
+//int ioctl(int fd, unsigned long request, ...) - the request is an unsigned long,
+//so it must be native sized or the upper half of the register is garbage on 64 bit.
+function ioctl(fd : Integer; request : NativeUInt) : Integer; cdecl varargs;
+  external libc name _PU + 'ioctl';
+
 const
   ESC = #27;
   CSI = #27'[';
@@ -290,7 +314,9 @@ begin
     if b <> Ord('C') then
       continue;
 
-    handler := GetHandler;
+    //parentheses are required - assigning to a variable of procedural type would
+    //otherwise take the address of GetHandler instead of calling it
+    handler := GetHandler();
     if not Assigned(handler) then
       continue;
 
@@ -454,9 +480,11 @@ end;
 
 function TPosixConsole.PlatformName : string;
 begin
-{$IFDEF MACOS}
+//$ELSEIF must follow $IF, not $IFDEF - otherwise the Linux branch is unreachable
+//and Linux reports itself as 'POSIX'.
+{$IF Defined(MACOS)}
   result := 'macOS';
-{$ELSEIF defined(LINUX)}
+{$ELSEIF Defined(LINUX)}
   result := 'Linux';
 {$ELSE}
   result := 'POSIX';
@@ -962,7 +990,8 @@ procedure TPosixConsole.TearDownCancelHandler;
 begin
   if FSignalDispatcher <> nil then
   begin
-    Posix.Signal.signal(SIGINT_VAL, SIG_DFL);
+    //SIG_DFL is an ordinal constant, signal() wants a TSignalHandler
+    Posix.Signal.signal(SIGINT_VAL, TSignalHandler(Pointer(NativeInt(SIG_DFL))));
     FSignalDispatcher.Stop;
     if FSignalDispatcher.FReadEnd  <> 0 then __close(FSignalDispatcher.FReadEnd);
     if FSignalDispatcher.FWriteEnd <> 0 then __close(FSignalDispatcher.FWriteEnd);
@@ -1450,7 +1479,8 @@ end;
 procedure TPosixConsole.SetCancelKeyPress(value : TConsoleCancelEventHandler);
 {$IFDEF POSIX}
 var
-  fds      : array[0..1] of Int32;
+  //the RTL declares pipe() as taking a TPipeDescriptors record, not an array
+  fds      : TPipeDescriptors;
   wasAssigned : Boolean;
 {$ENDIF}
 begin
@@ -1469,7 +1499,7 @@ begin
   begin
     if pipe(fds) <> 0 then
       exit;
-    FSignalDispatcher := TPosixSignalDispatcher.Create(Self, fds[0], fds[1]);
+    FSignalDispatcher := TPosixSignalDispatcher.Create(Self, fds.ReadDes, fds.WriteDes);
     Posix.Signal.signal(SIGINT_VAL, _PosixSigIntHandler);
   end;
   FSignalDispatcher.SetHandler(value);
