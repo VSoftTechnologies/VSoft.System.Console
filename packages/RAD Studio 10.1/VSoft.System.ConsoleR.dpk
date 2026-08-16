@@ -37,6 +37,6 @@ contains
   System.Console.StreamWriter in '..\..\src\System.Console.StreamWriter.pas',
   System.Console.SyncTextReader in '..\..\src\System.Console.SyncTextReader.pas',
   System.Console.Types in '..\..\src\System.Console.Types.pas',
-  System.Console.Windows in '..\..\src\System.Console.Windows.pas';
+  System.Console.Platform in '..\..\src\System.Console.Platform.pas';
 
 end.

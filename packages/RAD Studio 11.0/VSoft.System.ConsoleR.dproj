@@ -93,7 +93,7 @@
         <DCCReference Include="..\..\src\System.Console.StreamWriter.pas"/>
         <DCCReference Include="..\..\src\System.Console.SyncTextReader.pas"/>
         <DCCReference Include="..\..\src\System.Console.Types.pas"/>
-        <DCCReference Include="..\..\src\System.Console.Windows.pas"/>
+        <DCCReference Include="..\..\src\System.Console.Platform.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
