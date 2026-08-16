@@ -10,13 +10,11 @@ uses
   System.SysUtils,
   System.Console.Types in '..\src\System.Console.Types.pas',
   System.Console in '..\src\System.Console.pas',
-  System.Console.Windows in '..\src\System.Console.Windows.pas',
   System.Console.InternalTypes in '..\src\System.Console.InternalTypes.pas',
   System.Console.Posix in '..\src\System.Console.Posix.pas',
   System.Console.ConsoleStream in '..\src\System.Console.ConsoleStream.pas',
   System.Console.SyncTextReader in '..\src\System.Console.SyncTextReader.pas',
   System.Console.StreamWriter in '..\src\System.Console.StreamWriter.pas';
-
 
 const
    ESC = #27;    // \x1b
