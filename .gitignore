@@ -9,6 +9,9 @@
 *.rsm
 *.stat
 *.map
+*.o
+*.a
+
 
 # Backup files    #
 ###################
@@ -32,6 +35,7 @@
 /Win32
 /Win64
 /OSX32
+/Linux64
 __history
 /Tests/Win32
 /Tests/Win64
@@ -39,3 +43,5 @@ __history
 /Tests/__history
 src/__recovery
 packages/RAD Studio 13.0/WinARM64EC
+packages/RAD Studio 13.0/Linux64/Debug/System.Console.ConsoleStream.o
+packages/RAD Studio 13.0/Linux64/Debug/VSoft.System.ConsoleR.dpk.o

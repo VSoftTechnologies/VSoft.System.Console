@@ -379,7 +379,6 @@ begin
     end;
     if n = 0 then
       break; // EOF
-    Inc(p, n);
     Inc(total, n);
     // A short read on a TTY typically means the line is done; don't block for more.
     break;
@@ -855,7 +854,6 @@ begin
   pCount  := 0;
   current := 0;
   hasCur  := false;
-  final   := #0;
   FillChar(params, SizeOf(params), 0);
 
   while true do
@@ -894,8 +892,6 @@ begin
       ctrl  := (modByte and 4) <> 0;
     end;
   end;
-
-  key := TConsoleKey.None;
 
   if pCount = 0 then
     mainVal := 0
