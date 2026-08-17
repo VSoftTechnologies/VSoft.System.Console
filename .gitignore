@@ -12,6 +12,8 @@
 *.o
 *.a
 
+# CPP files
+*.hpp
 
 # Backup files    #
 ###################
