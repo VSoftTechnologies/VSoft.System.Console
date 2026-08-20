@@ -2,6 +2,8 @@ unit System.Console.InternalTypes;
 
 interface
 
+{$I 'System.Console.inc'}
+
 uses
   System.Types,
   System.Classes,
